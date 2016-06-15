@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.jmo.hello.dao.UserDao">
+
+    <resultMap type="UserDO" id="UserDOMap">
+        <result column="id" property="id" />
+        <result column="username" property="username" />
+        <result column="password" property="password" />
+        <result column="gender" property="gender" />
+        <result column="age" property="age" />
+        <result column="gmt_regist" property="gmtRegist" />
+    </resultMap>
+
+    <select id="checkUnique">
+        select
+        count(1)
+        from
+        user
+        where
+        name = #{name}
+        <if test="id != null">
+            and id != #{id}
+        </if>
+    </select>
+
+    <insert id="insert" parameterType="UserDO" useGeneratedKeys="true" keyProperty="id">
+        insert into
+        user(
+        username,
+        password,
+        gender,
+        age,
+        gmt_regist
+        )
+        value(
+        #{username},
+        #{password},
+        #{gender},
+        #{age},
+        #{gmtRegist}
+        )
+    </insert>
+
+    <update id="update" parameterType="UserDO">
+        update
+        user
+        <set>
+            <if test="username != null and username != ''">
+                username = #{username},
+            </if>
+            <if test="password != null and password != ''">
+                password = #{password},
+            </if>
+            <if test="gender != null and gender != ''">
+                gender = #{gender},
+            </if>
+            <if test="age != null">
+                age = #{age},
+            </if>
+            <if test="gmtRegist != null">
+                gmt_regist = #{gmtRegist},
+            </if>
+        </set>
+        where
+        id = #{id}
+    </update>
+
+    <select id="checkDelete" parameterType="int" resultType="int">
+        select
+        count(1)
+        from
+        user
+        where
+        1 = 1
+    </select>
+
+    <delete id="deleteById" parameterType="int">
+        delete from
+        user
+        where
+        id = #{id}
+    </delete>
+
+    <sql id="querySql">
+        <if test="username != null and username != ''">
+            and username = #{username}
+        </if>
+        <if test="password != null and password != ''">
+            and password = #{password}
+        </if>
+        <if test="gender != null and gender != ''">
+            and gender = #{gender}
+        </if>
+        <if test="age != null">
+            and age = #{age}
+        </if>
+    </sql>
+
+    <select id="getById" resultMap="UserDOMap">
+        select
+        *
+        from
+        user
+        where
+        id = #{id}
+    </select>
+
+    <select id="listByPid" resultMap="UserDOMap">
+        select
+        *
+        from
+        user
+        where
+        pid = #{pid}
+    </select>
+
+    <select id="listAll" resultMap="UserDOMap">
+        select
+        *
+        from
+        user
+    </select>
+
+    <select id="queryByParams" parameterType="map" resultMap="UserDOMap">
+        select
+        *
+        from
+        user
+        <where>
+            <include refid="querySql" />
+        </where>
+    </select>
+
+    <select id="queryByPage" parameterType="map" resultMap="UserDOMap">
+        select
+        *
+        from
+        user
+        <where>
+            <include refid="querySql" />
+        </where>
+        <if test="sort != null and sort != ''">
+            order by ${sort}
+        </if>
+        <if test="offset != null">
+            limit #{offset}, #{pageSize}
+        </if>
+    </select>
+
+    <select id="countByPage" parameterType="map" resultType="int">
+        select
+        count(1)
+        from
+        user
+        <where>
+            <include refid="querySql" />
+        </where>
+    </select>
+</mapper>
